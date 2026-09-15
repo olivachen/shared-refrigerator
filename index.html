@@ -2,211 +2,212 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shared Refrigerator / Gemeinschaftskühlschrank</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Gemeinschaftskühlschrank</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#F4F4F0',
+                        ink: '#1C1C1C',
+                        safety: '#0055FF',
+                        safetyhover: '#0044CC',
+                        grayborder: '#C0C0BC'
+                    },
+                    fontFamily: {
+                        sans: ['"Inter Tight"', 'sans-serif'],
+                        mono: ['"Space Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #F4F4F0; color: #1C1C1C; -webkit-font-smoothing: antialiased; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
-<body class="bg-stone-100 text-stone-900 min-h-screen pb-12" x-data="fridgeApp()">
+<body x-data="fridgeApp()" class="min-h-screen font-sans selection:bg-safety selection:text-white pb-24">
 
-    <!-- Header / Banner -->
-    <header class="bg-black text-white p-6 border-b-4 border-emerald-500 sticky top-0 z-10 shadow-md">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-black uppercase tracking-tight">Shared Refrigerator</h1>
-                <p class="text-xs text-stone-400 font-medium">Galopprennbahn • Mutual Aid Commons</p>
-            </div>
-            <button @click="lang = (lang === 'en' ? 'de' : 'en')" 
-                    class="bg-stone-800 hover:bg-stone-700 text-xs font-bold px-3 py-1.5 rounded-full border border-stone-600 transition">
-                <span x-text="lang === 'en' ? 'DE 🇩🇪' : 'EN 🇬🇧'"></span>
-            </button>
-        </div>
+    <header class="sticky top-0 z-50 bg-paper border-b-2 border-ink px-4 py-4">
+        <a href="#" @click.prevent="window.scrollTo(0,0)" class="block group w-max">
+            <h1 class="text-xl font-bold text-ink underline decoration-safety decoration-4 underline-offset-4 group-hover:text-safety transition-colors">
+                Gemeinschaftskühlschrank
+            </h1>
+            <p class="text-sm font-semibold text-gray-500 mt-1">(Shared Refrigerator)</p>
+        </a>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-6">
+    <main class="max-w-lg mx-auto p-4 space-y-10 mt-4">
 
-        <!-- Motto Banner -->
-        <div class="bg-emerald-100 border-2 border-emerald-600 p-4 rounded-xl text-center">
-            <p class="font-extrabold text-emerald-950 text-sm" x-text="lang === 'en' ? 'Take what you need, give what you can.' : 'Nimm, was du brauchst. Gib, was du kannst.'"></p>
-            <p class="text-xs text-emerald-800 mt-1" x-text="lang === 'en' ? 'Check dates • Check ingredients • Keep it safe' : 'MHD beachten • Zutaten prüfen • Sicher bleiben'"></p>
-        </div>
-
-        <!-- Add Item Form -->
-        <section class="bg-white p-4 rounded-xl border-2 border-stone-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-            <div class="flex justify-between items-center cursor-pointer" @click="showAddModal = !showAddModal">
-                <h2 class="font-black text-base uppercase flex items-center gap-2">
-                    <span class="text-xl">+</span> 
-                    <span x-text="lang === 'en' ? 'Log Food Item' : 'Essen Eintragen'"></span>
-                </h2>
-                <span class="text-xl font-bold" x-text="showAddModal ? '−' : '+'"></span>
-            </div>
-
-            <form x-show="showAddModal" x-transition @submit.prevent="addItem()" class="mt-4 space-y-3">
-                <!-- Name -->
-                <div>
-                    <label class="block text-xs font-bold uppercase mb-1" x-text="lang === 'en' ? 'Item Name' : 'Bezeichnung'"></label>
-                    <input type="text" x-model="newItem.name" required placeholder="e.g. Oat Milk / Hafermilch" 
-                           class="w-full p-2.5 border-2 border-stone-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+        <section>
+            <h2 class="text-sm font-bold uppercase tracking-wide text-gray-600 mb-4">Register New Item / Neuen Artikel erfassen</h2>
+            
+            <form @submit.prevent="addItem()" class="space-y-5 border-2 border-ink p-5 bg-white shadow-[4px_4px_0px_0px_#1C1C1C]">
+                
+                <div class="border-b-2 border-grayborder pb-3">
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Item Name / Bezeichnung</label>
+                    <input type="text" x-model="newItem.name" required placeholder="e.g. Hafermilch" 
+                           class="w-full text-lg font-semibold focus:outline-none bg-transparent placeholder-gray-400">
                 </div>
                 
-                <!-- Quantity & Category -->
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-bold uppercase mb-1" x-text="lang === 'en' ? 'Quantity' : 'Menge'"></label>
+                <div class="grid grid-cols-2 gap-6 border-b-2 border-grayborder pb-3">
+                    <div class="border-r-2 border-grayborder pr-6">
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Quantity / Menge</label>
                         <input type="number" min="1" x-model="newItem.qty" required 
-                               class="w-full p-2.5 border-2 border-stone-900 rounded-lg text-sm">
+                               class="w-full text-lg font-mono focus:outline-none bg-transparent">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase mb-1" x-text="lang === 'en' ? 'Category' : 'Kategorie'"></label>
-                        <select x-model="newItem.category" class="w-full p-2.5 border-2 border-stone-900 rounded-lg text-sm bg-white border-stone-900">
-                            <option value="Produce">🥦 Fresh Produce / Obst & Gemüse</option>
-                            <option value="Bakery">🍞 Bakery / Backwaren</option>
-                            <option value="Packaged">📦 Packaged / Haltbares</option>
-                            <option value="Drinks">🧃 Drinks / Getränke</option>
-                            <option value="Other">🍽️ Other / Sonstiges</option>
+                        <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Category / Kategorie</label>
+                        <select x-model="newItem.category" class="w-full text-base font-semibold focus:outline-none bg-transparent">
+                            <option value="Produce">Produce / Obst & Gemüse</option>
+                            <option value="Bakery">Bakery / Backwaren</option>
+                            <option value="Packaged">Packaged / Haltbares</option>
+                            <option value="Drinks">Drinks / Getränke</option>
+                            <option value="Other">Other / Sonstiges</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Best Before Date (MHD) -->
-                <div>
-                    <label class="block text-xs font-bold uppercase mb-1">
-                        <span x-text="lang === 'en' ? 'Best Before Date (MHD)' : 'Mindesthaltbarkeitsdatum (MHD)'"></span>
-                        <span class="text-stone-400 font-normal lowercase">(optional)</span>
-                    </label>
+                <div class="border-b-2 border-grayborder pb-3">
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Best Before / MHD (Optional)</label>
                     <input type="date" x-model="newItem.expiry" 
-                           class="w-full p-2.5 border-2 border-stone-900 rounded-lg text-sm bg-white">
+                           class="w-full text-base font-mono focus:outline-none bg-transparent text-ink">
                 </div>
 
-                <!-- Ingredients / Allergens / Notes -->
-                <div>
-                    <label class="block text-xs font-bold uppercase mb-1">
-                        <span x-text="lang === 'en' ? 'Ingredients / Allergens / Notes' : 'Zutaten / Allergene / Hinweise'"></span>
-                        <span class="text-stone-400 font-normal lowercase">(optional)</span>
-                    </label>
-                    <input type="text" x-model="newItem.notes" placeholder="e.g. Contains gluten, sealed, unopened" 
-                           class="w-full p-2.5 border-2 border-stone-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <div class="pb-2">
+                    <label class="block text-xs font-bold uppercase text-gray-600 mb-2">Notes / Notizen (Optional)</label>
+                    <input type="text" x-model="newItem.notes" placeholder="e.g. Unopened / Ungeöffnet" 
+                           class="w-full text-base font-semibold focus:outline-none bg-transparent placeholder-gray-400">
                 </div>
 
                 <button type="submit" 
-                        class="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-black uppercase py-3 rounded-lg border-2 border-stone-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 transition">
-                    <span x-text="lang === 'en' ? 'Add to Fridge Inventory' : 'Zum Kühlschrank Hinzufügen'"></span>
+                        class="w-full bg-safety hover:bg-safetyhover text-white font-bold text-lg py-4 transition-colors shadow-[2px_2px_0px_0px_#1C1C1C] active:translate-y-1 active:shadow-none">
+                    Submit Record / Eintrag speichern
                 </button>
             </form>
         </section>
 
-        <!-- Live Inventory Section -->
-        <section class="space-y-3">
-            <div class="flex justify-between items-baseline px-1">
-                <h2 class="font-black text-lg uppercase tracking-tight" x-text="lang === 'en' ? 'Current Shelf Items' : 'Aktueller Inhalt'"></h2>
-                <span class="text-xs font-bold bg-stone-200 px-2 py-1 rounded-full text-stone-700" x-text="items.length + ' items'"></span>
+        <section>
+            <div class="flex justify-between items-baseline mb-4 border-b-2 border-ink pb-2">
+                <h2 class="text-sm font-bold uppercase tracking-wide text-gray-600">Current Inventory / Aktueller Bestand</h2>
+                <span class="text-xs font-mono font-bold text-safety" x-text="items.length + ' Records / Einträge'"></span>
             </div>
 
-            <!-- Empty State -->
-            <template x-if="items.length === 0">
-                <div class="bg-white border-2 border-dashed border-stone-400 rounded-xl p-8 text-center space-y-2">
-                    <p class="text-3xl">🧊</p>
-                    <p class="font-bold text-sm text-stone-600" x-text="lang === 'en' ? 'The fridge is currently empty!' : 'Der Kühlschrank ist derzeit leer!'"></p>
-                    <p class="text-xs text-stone-500" x-text="lang === 'en' ? 'Be the first to drop off surplus food.' : 'Sei der/die Erste, der/die Essen vorbeibringt.'"></p>
-                </div>
-            </template>
+            <div x-show="loading" class="border-2 border-ink p-6 text-center text-base font-mono animate-pulse bg-white">
+                Loading database...
+            </div>
 
-            <!-- Item Cards -->
-            <div class="space-y-2.5">
-                <template x-for="(item, index) in items" :key="index">
-                    <div class="bg-white p-4 rounded-xl border-2 border-stone-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] space-y-3">
+            <div x-show="!loading && items.length === 0" class="border-2 border-ink border-dashed p-10 text-center text-gray-500 text-base font-semibold bg-white">
+                No items currently logged. / Derzeit keine Artikel erfasst.
+            </div>
+
+            <div class="space-y-4" x-show="!loading && items.length > 0">
+                <template x-for="(item, index) in items" :key="item.id">
+                    <div class="p-4 border-2 border-ink bg-white shadow-[4px_4px_0px_0px_#1C1C1C]">
                         <div class="flex justify-between items-start">
-                            <div>
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="font-black text-base" x-text="item.name"></span>
-                                    <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-stone-100 border border-stone-300" x-text="item.category"></span>
-                                </div>
-                                <p class="text-[11px] text-stone-500 mt-0.5">
-                                    <span x-text="lang === 'en' ? 'Logged: ' : 'Eingetragen: '"></span>
-                                    <span x-text="item.timestamp"></span>
+                            <div class="pr-4">
+                                <h3 class="font-bold text-xl text-ink" x-text="item.name"></h3>
+                                <p class="text-xs uppercase font-semibold text-gray-600 mt-1">
+                                    <span x-text="item.category"></span>
+                                    <template x-if="item.expiry">
+                                        <span x-text="' | MHD: ' + item.expiry"></span>
+                                    </template>
                                 </p>
+                                <template x-if="item.notes">
+                                    <p class="text-sm font-medium text-gray-700 mt-2 bg-gray-100 p-2 inline-block border border-grayborder" x-text="'* ' + item.notes"></p>
+                                </template>
                             </div>
-                            <span class="font-black text-lg bg-emerald-100 text-emerald-900 px-3 py-1 rounded-lg border border-emerald-400" x-text="item.qty + 'x'"></span>
+                            
+                            <div class="flex flex-col items-end shrink-0">
+                                <div class="font-mono text-3xl font-bold text-ink" x-text="item.qty + 'x'"></div>
+                                <button @click="takeItem(item.id, item.qty)" 
+                                        class="mt-3 text-xs font-bold uppercase text-safety border-2 border-safety px-4 py-2 hover:bg-safety hover:text-white transition-colors">
+                                    Take 1 / 1 Entnehmen
+                                </button>
+                            </div>
                         </div>
-
-                        <!-- Date & Allergen Badges -->
-                        <div class="flex flex-wrap gap-2 text-xs pt-1 border-t border-stone-100">
-                            <template x-if="item.expiry">
-                                <span class="bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
-                                    ⏳ <span x-text="(lang === 'en' ? 'Best before: ' : 'MHD: ') + item.expiry"></span>
-                                </span>
-                            </template>
-                            <template x-if="item.notes">
-                                <span class="bg-blue-50 text-blue-900 border border-blue-200 px-2 py-0.5 rounded font-medium flex items-center gap-1">
-                                    🏷️ <span x-text="item.notes"></span>
-                                </span>
-                            </template>
-                        </div>
-
-                        <!-- Action Button -->
-                        <div class="flex justify-end pt-1">
-                            <button @click="takeItem(index)" 
-                                    class="bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs uppercase px-4 py-2 rounded-lg border border-stone-900 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 transition">
-                                <span x-text="lang === 'en' ? 'Take / Took Item' : 'Entnommen'"></span>
-                            </button>
+                        <div class="text-[10px] font-mono text-gray-400 mt-4 pt-2 border-t border-grayborder flex justify-between">
+                            <span x-text="'LOG: ' + item.id.substring(0,8)"></span>
+                            <span x-text="new Date(item.created_at).toLocaleDateString() + ' ' + new Date(item.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></span>
                         </div>
                     </div>
                 </template>
             </div>
         </section>
-
     </main>
 
     <script>
+        const SUPABASE_URL = 'https://wdmyownmgtceuwqhichz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkbXlvd25tZ3RjZXV3cWhpY2h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDIzOTksImV4cCI6MjEwNTA3ODM5OX0.cBZCGoO1WVKn-RFurel2TBz6E2UeLNf9G5TrQmWFfVU';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         function fridgeApp() {
             return {
-                lang: 'en',
-                showAddModal: true,
+                loading: true,
+                items: [],
                 newItem: { name: '', qty: 1, category: 'Produce', expiry: '', notes: '' },
-                items: JSON.parse(localStorage.getItem('fridge_items')) || [
-                    { 
-                        name: 'Oat Milk (Unopened)', 
-                        qty: 2, 
-                        category: 'Drinks', 
-                        expiry: '2026-09-15', 
-                        notes: 'Gluten-free, store chilled', 
-                        timestamp: 'Today, 14:20' 
-                    },
-                    { 
-                        name: 'Fresh Apples', 
-                        qty: 5, 
-                        category: 'Produce', 
-                        expiry: '', 
-                        notes: 'Washed, local produce', 
-                        timestamp: 'Today, 11:05' 
-                    }
-                ],
-                addItem() {
-                    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    this.items.unshift({
-                        name: this.newItem.name,
-                        qty: parseInt(this.newItem.qty),
-                        category: this.newItem.category,
-                        expiry: this.newItem.expiry,
-                        notes: this.newItem.notes,
-                        timestamp: `Today, ${time}`
-                    });
-                    this.save();
-                    this.newItem = { name: '', qty: 1, category: 'Produce', expiry: '', notes: '' };
+                
+                async init() {
+                    await this.fetchItems();
+                    supabase.channel('public:fridge_inventory')
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'fridge_inventory' }, payload => {
+                            this.fetchItems();
+                        })
+                        .subscribe();
                 },
-                takeItem(index) {
-                    if (this.items[index].qty > 1) {
-                        this.items[index].qty--;
+
+                async fetchItems() {
+                    this.loading = true;
+                    const { data, error } = await supabase
+                        .from('fridge_inventory')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    
+                    if (!error) this.items = data;
+                    this.loading = false;
+                },
+
+                async addItem() {
+                    if(this.newItem.name.trim() === '') return;
+                    const { error } = await supabase
+                        .from('fridge_inventory')
+                        .insert([{
+                            name: this.newItem.name,
+                            qty: parseInt(this.newItem.qty),
+                            category: this.newItem.category,
+                            expiry: this.newItem.expiry,
+                            notes: this.newItem.notes
+                        }]);
+
+                    if (!error) {
+                        this.newItem = { name: '', qty: 1, category: 'Produce', expiry: '', notes: '' };
+                        this.fetchItems();
                     } else {
-                        this.items.splice(index, 1);
+                        alert("Database error: " + error.message);
                     }
-                    this.save();
                 },
-                save() {
-                    localStorage.setItem('fridge_items', JSON.stringify(this.items));
+
+                async takeItem(id, currentQty) {
+                    if (currentQty > 1) {
+                        await supabase.from('fridge_inventory').update({ qty: currentQty - 1 }).eq('id', id);
+                    } else {
+                        await supabase.from('fridge_inventory').delete().eq('id', id);
+                    }
+                    this.fetchItems();
                 }
             }
         }
