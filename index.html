@@ -152,7 +152,6 @@
         const SUPABASE_URL = 'https://wdmyownmgtceuwqhichz.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndkbXlvd25tZ3RjZXV3cWhpY2h6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1MDIzOTksImV4cCI6MjEwNTA3ODM5OX0.cBZCGoO1WVKn-RFurel2TBz6E2UeLNf9G5TrQmWFfVU';
         
-        // Renamed variable to prevent collision with window.supabase
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function fridgeApp() {
